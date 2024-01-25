@@ -53,7 +53,7 @@ const double AlAv[M]={1.009,0.600,0.118,0.184,0.225};///From besancon model[VIKH
 const double sigma[M]={0.022,0.022,0.02,0.025,0.025};//MOAاستفاده از مقاله کاردلی
 const double Akv=0.118;
 const double cade1=double(15.16/60.0/24.0);//W149_cadence in  day
-const double dt=cade1*0.01;//double(7.58/60.0/24.0);//days
+
 const int coun= 37000;
 const double Tobs=double(62.0); 
 ////=======================================================
@@ -241,16 +241,16 @@ int main()
      
    
     FILE* fil1;
-    fil1=fopen("./files/MONT1/FFP_Roman1c.dat","w");
+    fil1=fopen("./files/MONT1/FFP_Roman1m.dat","w");
     fclose(fil1);
 
-    FILE* fil2;
-    fil2=fopen("./files/MONT1/FFP_Roman2c.dat","w");
-    fclose(fil2);
+    //FILE* fil2;
+    //fil2=fopen("./files/MONT1/FFP_Roman2c.dat","w");
+    //fclose(fil2);
     
-    FILE* fil3;
-    fil3=fopen("./files/MONT1/FFP_Roman3c.dat","w");
-    fclose(fil3);
+    //FILE* fil3;
+    //fil3=fopen("./files/MONT1/FFP_Roman3c.dat","w");
+    //fclose(fil3);
 
 
 
@@ -272,7 +272,7 @@ int main()
   
 
     int    flag_det=0;
-    int    flagf,counter=11346;
+    int    flagf,counter=8083;
     int    ndw;
     char   filnam1[40], filnam2[40];
     double magnio, test, tmin, tmax;
@@ -290,22 +290,25 @@ int main()
     double errg, errs, amp, numc; 
     double prob1, prob2;  
     double traj0, trajm, trajp;
-    int    datf;
-    int    nsim=0; 
+    int    datf, li;
+    int    nsim=0;
+    double dt, astar, astar0;  
    
    
-   double *timn=new double[coun];
-   double *magn=new double[coun];
-   double *soux=new double[coun];
-   double *souy=new double[coun];
-   double *errm=new double[coun];
-   double *erra=new double[coun];
+  // double *timn=new double[coun];
+   //double *magn=new double[coun];
+   //double *soux=new double[coun];
+   //double *souy=new double[coun];
+   //double *errm=new double[coun];
+   //double *erra=new double[coun];
    
 
  
-     for(int icon=1; icon<2000; ++icon){
+     for(int icon=1; icon<50000; ++icon){
      //cout<<"***** Step:  "<<icon<<endl;
-     for (int li=1; li<=7; li++){
+    // for (int li=1; li<=7; li++){
+     li=int(RandR(1.01,7.9));
+     
      if(li==1) {lonn0=1.3;  lat0=-0.875; }
      if(li==2) {lonn0=0.9;  lat0=-0.875; }
      if(li==3) {lonn0=1.3;  lat0=-1.625; }
@@ -326,22 +329,23 @@ int main()
      
      
      if(int(Extinction(ex,s))==1){
+     
      do{
      func_source(s, cm, ex);
-     func_lens(l, s);
-     }while(l.tE<=cade1 or l.tE>100.0 and s.ros>99.0);//5 years
+     func_lens(l,s);
+     }while(double(l.tE*s.ros)<double(0.2*cade1) and l.tE>100.0 and s.ros>99.0);//5 years
      optical_depth(s);
    
-     s.mus1= double(s.SV_n1- s.VSun_n1)*1000.0*3600.0*24.0/(s.Ds*AU);///mas/days
-     s.mus2= double(s.SV_n2- s.VSun_n2)*1000.0*3600.0*24.0/(s.Ds*AU);///mas/days
-     s.mul1= double(s.LV_n1- s.VSun_n1)*1000.0*3600.0*24.0/(l.Dl*AU);///mas/days
-     s.mul2= double(s.LV_n2- s.VSun_n2)*1000.0*3600.0*24.0/(l.Dl*AU);///mas/days 
-     l.piE = double(1.0/l.Dl -1.0/s.Ds)/l.tetE; 
+     s.mus1=double(s.SV_n1- s.VSun_n1)*1000.0*3600.0*24.0/(s.Ds*AU);///mas/days
+     s.mus2=double(s.SV_n2- s.VSun_n2)*1000.0*3600.0*24.0/(s.Ds*AU);///mas/days
+     s.mul1=double(s.LV_n1- s.VSun_n1)*1000.0*3600.0*24.0/(l.Dl*AU);///mas/days
+     s.mul2=double(s.LV_n2- s.VSun_n2)*1000.0*3600.0*24.0/(l.Dl*AU);///mas/days 
+     l.piE =double(1.0/l.Dl -1.0/s.Ds)/l.tetE; 
      
      cout<<"mus1:  "<<s.mus1<<"\t mus2:  "<<s.mus2<<endl; 
      cout<<"mul1:  "<<s.mul1<<"\t mul2:  "<<s.mul2<<"\t l.piE:  "<<l.piE<<endl; 
      cout<<"blending:  "<<s.fb<<"\t m_base:  "<<s.mbs<<"\t Dl:  "<<l.Dl<<"\t Ds:  "<<s.Ds<<endl;   
-     //int uue; cin>>uue;  
+
     
      test=RandR(0.0,1.0);
      if(test<=s.fb and s.mbs<=thre[4]){
@@ -358,8 +362,8 @@ int main()
    
 ///*********************************************************************************   
 
-     for(int i=0; i<coun; ++i){
-     timn[i]=0.0; magn[i]=0.0; soux[i]=0.0;  souy[i]=0.0;  errm[i]=0.0;  erra[i]=0.0; }
+     //for(int i=0; i<coun; ++i){
+    // timn[i]=0.0; magn[i]=0.0; soux[i]=0.0;  souy[i]=0.0;  errm[i]=0.0;  erra[i]=0.0; }
      flag0=0.0; 
      flag1=0.0;  
      flag2=0.0;
@@ -371,10 +375,16 @@ int main()
      numc=0.0;  
      
      
-     tmin=l.t0-2.0*l.tE; 
-     tmax=l.t0+2.0*l.tE; 
+     tmin=l.t0-2.5*l.tE; 
+     tmax=l.t0+2.5*l.tE; 
+     if(s.ros>1.0){
+     tmin=l.t0-2.5*l.tE*s.ros; 
+     tmax=l.t0+2.5*l.tE*s.ros;}
+     dt=double((tmax-tmin)/800.0);
+     if(dt>float(0.5*cade1))   dt=double(cade1*0.06);  
+    
+    
      for(tim=tmin; tim<tmax;  tim+=dt){
-     
      lightcurve(s,l,as,tim); 
      Astar0= vbb.ESPLMag2(s.ut0, s.ros); 
      s.Astar=vbb.ESPLMag2(s.ut , s.ros); 
@@ -384,20 +394,17 @@ int main()
      magni0[i] =s.magb[i]-2.5*log10( Astar0*s.blend[i] + 1.0 - s.blend[i]);
      magni[i]  =s.magb[i]-2.5*log10(s.Astar*s.blend[i] + 1.0 - s.blend[i]);}
      
-
-     
+     astar= double( s.Astar*s.blend[4] + 1.0 - s.blend[4]);
+     astar0=double( Astar0*s.blend[4] + 1.0 - s.blend[4]);
+    
      if(flagf>0) 
-     fprintf(magg,"%.4lf %.4lf %.4lf  %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf %.4lf\n",
-     tim,magni0[4],magni[4],Astar0,s.Astar,s.pos1b,s.pos2b,s.pos1c,s.pos2c,s.def1a,s.def2a,s.def1c,s.def2c,s.ux0,s.uy0,s.ux,s.uy);
-     //17
-     
+     fprintf(magg,"%.4lf %.5lf %.5lf  %.4lf  %.4lf  %.4lf  %.4lf\n",tim,magni0[4],magni[4],s.ux0,s.uy0,s.ux,s.uy);
 
      numc+=1.0; 
      s.ampA+=float((s.def1a-s.def1c)*(s.def1a-s.def1c)+(s.def2a-s.def2c)*(s.def2a-s.def2c)); 
      s.ampM+=float((s.Astar- Astar0)*(s.Astar-Astar0));///Ampl in magnification 
      
-   
-    
+
      datf=0; 
      if(tim>=0.0 and tim<Tobs){
      timp1 += dt; 
@@ -406,39 +413,23 @@ int main()
      prob2=RandR(0.0,100.0);//Uniform observation
      if(prob2>10.0) datf=1;}}
        
+       
+       
      if(datf>0){
      if(magni[4]>=satu[4] and magni[4]<=thre[4]){
-     errg= errwfirst(ro, magni[4], 0); 
-     errs= errwfirst(ro, magni[4], 1); 
-     magnio=magni[4] + RandN(errg ,3.0);
+     errg= errwfirst(ro,magni[4], 0);
+     magnio=magni[4]+RandN(errg,3.0);
      
-     chi1 +=fabs( (magnio-  magni[4])*(magnio-  magni[4])/(errg*errg)); ///lensing + parallax
-     chi2 +=fabs( (magnio- magni0[4])*(magnio- magni0[4])/(errg*errg)); ///lensing 
-     chi3 +=fabs( (magnio-     s.mbs)*(magnio-     s.mbs)/(errg*errg)); ///baseline
-
-     //sil= RandN(errs*sqrt(2.0), 3.0) ;
-     //traj0= sqrt(s.pos1a*s.pos1a + s.pos2a*s.pos2a );///stright  
-     //trajm= sqrt(s.pos1b*s.pos1b + s.pos2b*s.pos2b );///Lensing   
-     //trajp= sqrt(s.pos1c*s.pos1c + s.pos2c*s.pos2c );///Lensing  +parallax  
-     //chi1a+= fabs( (trajp+sil-trajp)*(trajp+sil-trajp)/(errs*errs*2.0) ); /// Lensing+parallax
-     //chi2a+= fabs( (trajp+sil-trajm)*(trajp+sil-trajm)/(errs*errs*2.0) ); ///Lensing
-     //chi3a+= fabs( (trajp+sil-traj0)*(trajp+sil-traj0)/(errs*errs*2.0) ); ///baseline
+     chi1+=fabs((magnio-  magni[4])*(magnio-  magni[4])/(errg*errg)); ///lensing + parallax
+     chi2+=fabs((magnio- magni0[4])*(magnio- magni0[4])/(errg*errg)); ///lensing 
+     chi3+=fabs((magnio-     s.mbs)*(magnio-     s.mbs)/(errg*errg)); ///baseline
+     deltaA=fabs(pow(10.0,-0.4*errg)-1.0)*astar; 
      
-     
-     timn[ndw]=tim;
-     magn[ndw]=magni[4];
-     errm[ndw]=errg;
-     soux[ndw]=s.pos1c;
-     souy[ndw]=s.pos2c;
-     erra[ndw]=errs;
-     
-     deltaA=fabs(pow(10.0,-0.4*errg)-1.0)*s.Astar; 
      if(deltaA<s.errM)   s.errM=deltaA; 
      if(errs<  s.errA)   s.errA=errs; 
      
      if(flagf>0) 
-     fprintf(data3,"%.4lf  %.4lf  %.6lf  %.4lf  %.6lf  %.4lf   %.4lf  %.6lf %d\n",
-     tim, magnio,errg, s.Astar+RandN(deltaA,3.0),deltaA, s.pos1c+RandN(errs,3.0), s.pos2c+RandN(errs,3.0), errs,0);///9
+     fprintf(data3,"%.5lf  %.5lf  %.6lf\n",tim,magnio,errg);//,astar+RandN(deltaA,3.0),deltaA);
      flag2=0.0;
      if(fabs(magnio-s.mbs)>fabs(4.0*errg))         flag2=1.0;
      if(ndw>1 and float(flag0+flag1+flag2)>2.0)   flag_det=1;
@@ -447,6 +438,8 @@ int main()
      ndw+=1;
      if(ndw>=coun){cout<<"Error ndw:  "<<ndw<<"\t coun:  "<<coun<<endl;  int uue; cin>>uue; }}}
      }///end of loop time 
+     
+     
      if(flagf>0){fclose(data3); fclose(magg); }
     ///************ WFIRST *********************************************************************
     
@@ -463,7 +456,7 @@ int main()
     s.ampA=sqrt(s.ampA/numc);//RMS
     
     if(dchi1>500.0 and flag_det>0 and ndw>5){
-    fil1=fopen("./files/MONT1/FFP_Roman1c.dat","a+");
+    fil1=fopen("./files/MONT1/FFP_Roman1m.dat","a+");
     fprintf(fil1,
    "%d  %.5lf   %.5lf  "///3
    "%d  %.8lf   %.5lf   %.5lf  "///7
@@ -676,10 +669,10 @@ int main()
    }//if wfirst>0
    }//if magnitude of baseline 
    }//end of EXtinction
-   }//loop icon
+   //}//loop icon
    } ///loop il
    
-   delete [] magn, timn, soux, souy, errm, erra; 
+  // delete [] magn, timn, soux, souy, errm, erra; 
    return(0);
 }
 ///&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
